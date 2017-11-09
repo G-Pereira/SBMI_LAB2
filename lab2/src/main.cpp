@@ -1,15 +1,16 @@
 #include <avr/io.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
+#include <avr/eeprom.h>
 
-#define GREEN PB1
 #define RED PB0
-#define BUTTON PD2
+#define GREEN PB1
+#define BUTTON PB2
 
 #define COUNT (256-250)
 
-uint8_t volatile state = 0;
-uint8_t timer = 0;
+uint8_t state = 0;
+uint16_t volatile timer = 0;
 
 ISR(TIMER2_OVF_vect) {
     TCNT2 = COUNT;
@@ -18,37 +19,39 @@ ISR(TIMER2_OVF_vect) {
 }
 
 int main() {
-    TCCR2B |= (1 << CS22);
+    TCCR2A = 0;
+    TCCR2B = 0;
+    TCNT2 = COUNT;
 
     DDRB |= (1 << GREEN);
     DDRB |= (1 << RED);
 
-    DDRD &= ~(1 << BUTTON);
-    PORTD |= (1 << BUTTON);
+    DDRB &= ~(1 << BUTTON);
+    PORTB |= (1 << BUTTON);
 
-    EICRA |= (1 << ISC01);
-    EIMSK |= (1 << INT0);
+    TIMSK2 |= (1 << TOIE2);
 
     sei();
+    TCCR2B |= (1 << CS22);
 
     while (1) {
-
-        if (state == 0 && (!(PIND & (1 << PD2)))) {
+        if (0 == state && (!(PINB & (1 << BUTTON)))) {
             srand(TCNT2);
-            timer = (uint8_t) rand() % 5000 + 5000;
+            timer = (uint16_t) rand() % 5000 + 5000;
             state = 1;
-        } else if (state == 1 && timer == 0) {
+        } else if (1 == state && 0 == timer) {
             state = 2;
-        } else if (state == 2 && (!(PIND & (1 << PD2)))) {
+            timer = UINT16_MAX;
+        } else if (2 == state && ((!(PINB & (1 << BUTTON)))) || (0 == timer)) {
             state = 0;
         }
-        if (state == 0) {
+        if (0 == state) {
             PORTB &= ~(1 << GREEN);
             PORTB &= ~(1 << RED);
-        } else if (state == 1) {
+        } else if (1 == state) {
             PORTB |= (1 << GREEN);
             PORTB &= ~(1 << RED);
-        } else if (state == 2) {
+        } else if (2 == state) {
             PORTB |= (1 << GREEN);
             PORTB |= (1 << RED);
         }
