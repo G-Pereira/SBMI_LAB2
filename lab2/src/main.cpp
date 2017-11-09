@@ -6,15 +6,20 @@
 #define RED PB0
 #define BUTTON PD2
 
+#define COUNT (256-250)
+
 uint8_t volatile state = 0;
-float timerCount = 0;
+uint64_t timerCountMs = 0;
+uint8_t timer = 0;
 
-ISR(TIMER1_OVF_vect) {
-
+ISR(TIMER2_OVF_vect) {
+    TCNT2 = COUNT;
+    if (timer)
+        timer--;
 }
 
 int main() {
-    TCCR1B |= (1 << CS10);
+    TCCR2B = 0b00000011;
 
     DDRB |= (1 << GREEN);
     DDRB |= (1 << RED);
@@ -28,19 +33,16 @@ int main() {
     sei();
 
     while (1) {
-        if (16000 <= TCNT1) {
-            timerCount += 0.01;
-            TCNT1 = 0; // Reset timer value
-        }
+
         if (state == 0 && (!(PIND & (1 << PD2)))) {
-            timerCount = 0;
+            timerCountMs = 0;
             state = 1;
-        } else if (state == 1 /* TODO: random number between 5-10s */) {
+        } else if (state == 1) { // TODO: random number between 5-10s
             state = 2;
-            timerCount = 0;
+            timerCountMs = 0;
         } else if (state == 2 && (!(PIND & (1 << PD2)))) {
             state = 0;
-            timerCount = 0;
+            timerCountMs = 0;
         }
         if (state == 0) {
             PORTB &= ~(1 << GREEN);
