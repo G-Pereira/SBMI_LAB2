@@ -1,10 +1,10 @@
 #include <avr/io.h>
 #include <stdlib.h>
 #include <avr/interrupt.h>
-#include <avr/delay.h>
 
 #define GREEN PB1
 #define RED PB0
+#define BUTTON PD2
 
 uint8_t volatile state = 0;
 float timerCount = 0;
@@ -19,8 +19,8 @@ int main() {
     DDRB |= (1 << GREEN);
     DDRB |= (1 << RED);
 
-    DDRD &= ~(1 << PD2);
-    PORTD |= (1 << PD2);
+    DDRD &= ~(1 << BUTTON);
+    PORTD |= (1 << BUTTON);
 
     EICRA |= (1 << ISC01);
     EIMSK |= (1 << INT0);
