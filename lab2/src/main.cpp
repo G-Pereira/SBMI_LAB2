@@ -9,7 +9,6 @@
 #define COUNT (256-250)
 
 uint8_t volatile state = 0;
-uint64_t timerCountMs = 0;
 uint8_t timer = 0;
 
 ISR(TIMER2_OVF_vect) {
@@ -19,7 +18,7 @@ ISR(TIMER2_OVF_vect) {
 }
 
 int main() {
-    TCCR2B = 0b00000011;
+    TCCR2B |= (1 << CS22);
 
     DDRB |= (1 << GREEN);
     DDRB |= (1 << RED);
@@ -35,14 +34,12 @@ int main() {
     while (1) {
 
         if (state == 0 && (!(PIND & (1 << PD2)))) {
-            timerCountMs = 0;
+            
             state = 1;
         } else if (state == 1) { // TODO: random number between 5-10s
             state = 2;
-            timerCountMs = 0;
         } else if (state == 2 && (!(PIND & (1 << PD2)))) {
             state = 0;
-            timerCountMs = 0;
         }
         if (state == 0) {
             PORTB &= ~(1 << GREEN);
