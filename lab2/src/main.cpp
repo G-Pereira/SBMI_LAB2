@@ -6,14 +6,12 @@
 #define GREEN PB1
 #define RED PB0
 
-int state = 0;
+uint8_t volatile state = 0;
 float timerCount = 0;
-
 
 ISR(INT0_vect) {
 
 }
-
 
 int main() {
     TCCR1B |= (1 << CS10);
@@ -34,24 +32,19 @@ int main() {
             timerCount += 0.01;
             TCNT1 = 0; // Reset timer value
         }
-
         if (state == 0 && (!(PIND & (1 << PD2)))) {
-            timerCount=0;
+            timerCount = 0;
             state = 1;
-        } else if (state == 1 && timerCount >= 15) {
-            state=2;
-            timerCount=0;
-            else if(state ==1 && (!(PIND & (1 << PD2)))){
-                state = 0;
-                timerCount = 0;
-            }
+        } else if (state == 1 /* TODO: random number between 5-10s */) {
+            state = 2;
+            timerCount = 0;
         } else if (state == 2 && (!(PIND & (1 << PD2)))) {
             state = 0;
             timerCount = 0;
         }
-        if(state == 0){
-            PORTB &= ~(1<<GREEN);
-            PORTB &= ~(1<<RED);
+        if (state == 0) {
+            PORTB &= ~(1 << GREEN);
+            PORTB &= ~(1 << RED);
         } else if (state == 1) {
             PORTB |= (1 << GREEN);
             PORTB &= ~(1 << RED);
@@ -60,4 +53,5 @@ int main() {
             PORTB |= (1 << RED);
         }
     }
+
 }
