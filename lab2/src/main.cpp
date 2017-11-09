@@ -34,9 +34,10 @@ int main() {
     while (1) {
 
         if (state == 0 && (!(PIND & (1 << PD2)))) {
-            
+            srand(TCNT2);
+            timer = (uint8_t) rand() % 5000 + 5000;
             state = 1;
-        } else if (state == 1) { // TODO: random number between 5-10s
+        } else if (state == 1 && timer == 0) {
             state = 2;
         } else if (state == 2 && (!(PIND & (1 << PD2)))) {
             state = 0;
