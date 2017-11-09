@@ -9,7 +9,7 @@
 uint8_t volatile state = 0;
 float timerCount = 0;
 
-ISR(INT0_vect) {
+ISR(TIMER1_OVF_vect) {
 
 }
 
