@@ -21,6 +21,8 @@ ISR(TIMER2_OVF_vect) {
 int main() {
     TCCR2A = 0;
     TCCR2B = 0;
+    TCCR2B |= (1 << CS22);
+    TIMSK2 |= (1 << TOIE2);
     TCNT2 = COUNT;
 
     DDRB |= (1 << GREEN);
@@ -29,10 +31,7 @@ int main() {
     DDRB &= ~(1 << BUTTON);
     PORTB |= (1 << BUTTON);
 
-    TIMSK2 |= (1 << TOIE2);
-
     sei();
-    TCCR2B |= (1 << CS22);
 
     while (1) {
         if (0 == state && (!(PINB & (1 << BUTTON)))) {
