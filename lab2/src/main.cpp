@@ -48,7 +48,7 @@ int main() {
     sei();
 
     // Check if memory is signed to initialize score or not
-    if (eeprom_read_byte(&signature) != 0b11110100) {
+    if (eeprom_read_byte(&signature) != 0b11110100 || !(PINB & (1 << BUTTON))) {
         eeprom_write_byte(&signature, 0b11110100);
         eeprom_write_word(&best, UINT16_MAX);
     }
@@ -65,6 +65,11 @@ int main() {
             srand(TCNT2);
             timer = (uint16_t) rand() % 5000 + 5000;
             state = 1;
+        }else if(1==state && !(PINB & (1 << BUTTON))){
+            printf("Attempt number %u= %ums due to faulty play! You bastard...\n", attemptN + 1, 5000);
+            sum += 5000;
+            attemptN++;
+            state = 0;
         } else if (1 == state && 0 == timer) {
             state = 2;
             timer = UINT16_MAX;
@@ -75,7 +80,7 @@ int main() {
             sum += currentAttempt;
             attemptN++;
             state = 3;
-        }else if (2 == state && (5000 == UINT16_MAX - timer)) {
+        } else if (2 == state && (5000 == UINT16_MAX - timer)) {
             printf("Attempt number %u= %ums due to time expiration! Slow hands...\n", attemptN + 1, 5000);
             sum += 5000;
             attemptN++;
