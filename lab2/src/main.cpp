@@ -19,7 +19,7 @@
 uint8_t state = 0;
 uint16_t volatile timer = 0;
 
-uint8_t EEMEM signature = 0b11110100;
+uint8_t EEMEM signature = 0b11110100; // TODO: Why initialize?
 uint16_t EEMEM best = UINT16_MAX;
 
 ISR(TIMER2_OVF_vect) {
@@ -47,6 +47,7 @@ int main() {
 
     sei();
 
+    // Check if memory is signed to initialize score or not
     if (eeprom_read_byte(&signature) != 0b11110100) {
         eeprom_write_byte(&signature, 0b11110100);
         eeprom_write_word(&best, UINT16_MAX);
@@ -67,13 +68,18 @@ int main() {
         } else if (1 == state && 0 == timer) {
             state = 2;
             timer = UINT16_MAX;
-        } else if (2 == state && (!(PINB & (1 << BUTTON)) || (0 == timer))) {
+        } else if (2 == state && !(PINB & (1 << BUTTON))) {
             // value to store UINT16_MAX - timer
             currentAttempt = UINT16_MAX - timer;
             printf("Attempt number %u= %ums\n", attemptN + 1, currentAttempt);
             sum += currentAttempt;
             attemptN++;
             state = 3;
+        }else if (2 == state && (0 == timer)) {
+            printf("Attempt number %u= %ums due to time expiration! Slow hands...\n", attemptN + 1, 5000);
+            sum += 5000;
+            attemptN++;
+            state = 0;
         } else if (3 == state && (PINB & (1 << BUTTON))) {
             state = 0;
         }
