@@ -75,7 +75,7 @@ int main() {
             sum += currentAttempt;
             attemptN++;
             state = 3;
-        }else if (2 == state && (0 == timer)) {
+        }else if (2 == state && (5000 == UINT16_MAX - timer)) {
             printf("Attempt number %u= %ums due to time expiration! Slow hands...\n", attemptN + 1, 5000);
             sum += 5000;
             attemptN++;
