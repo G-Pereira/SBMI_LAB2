@@ -70,7 +70,7 @@ int main() {
         } else if (2 == state && (!(PINB & (1 << BUTTON)) || (0 == timer))) {
             // value to store UINT16_MAX - timer
             currentAttempt = UINT16_MAX - timer;
-            printf("Attempt number %u= %ums", attemptN + 1, currentAttempt);
+            printf("Attempt number %u= %ums\n", attemptN + 1, currentAttempt);
             sum += currentAttempt;
             attemptN++;
             state = 3;
