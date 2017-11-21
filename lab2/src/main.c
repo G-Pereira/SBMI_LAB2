@@ -64,12 +64,12 @@ int main() {
             srand(TCNT2);
             timer = (uint16_t) rand() % 5000 + 5000;
             state = 1;
-        } else if (1 == state && !(PINB & (1 << BUTTON))) {
+        } else if (1 == state && 0 == timer && !(PIND & (1 << BUTTON))) {
             printf("Attempt number %u= %ums due to faulty play! You bastard...\n", attemptN + 1, 5000);
             sum += 5000;
             attemptN++;
             state = 3;
-        } else if (1 == state && 0 == timer) {
+        } else if (1 == state && 0 == timer && (PIND & (1 << BUTTON))) {
             state = 2;
             timer = UINT16_MAX;
         } else if (2 == state && !(PIND & (1 << BUTTON))) {
